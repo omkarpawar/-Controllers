@@ -1,37 +1,56 @@
-const http = require('http');
+const http =require('http');
+const fs = require('fs');
 
 const server = http.createServer((req,res)=>{
-
-    res.writeHead(200,{'Content-Type':'text/html'});
-    res.end("welcome to the page");
-
-
     const url=req.url;
+    const method = req.method;
+    if(url === '/'){
+        fs.readFile("message1.txt",{encoding:"utf-8"},(err,data)=>{
+            if(err){
+                console.log(err);
+            }
+            
+            res.write('<html>');
+            res.write('<head><title>demo</title></head>');
+            res.write(`<body>${data}</body>`);
+            res.write('<body><form action="/message" method="POST"><input type="text" name="message"></input><button type="submit"  >SUBMIT</button></form></body>')
+            res.write('</html>')
+            return res.end();
+        })
+       
 
-    if(url==='/home'){
 
-        res.writeHead=(200,{'Content-Type':'text/html'});
-        res.end('Welcome Home ');
+    }
+    if(url === '/message' && method ==='POST' ){
 
-    }else if(url==='/about'){
+        const body =[];
+        req.on('data',(chunk)=>{
+            console.log(chunk);
+            body.push(chunk);
+        });
 
-        res.writeHead=(200,{'Content-Type':'text/html'});
-        res.end('Welcome to about');
+        req.on('end',()=>{
+            const parseBody=Buffer.concat(body).toString();
+            const message=parseBody.split('=')[1];
+            fs.writeFile('message1.txt' , message, err =>{
+                if(err){
+                    console.log(err);
+                }
+                res.statusCode=302;
+                res.setHeader('Location','/');
+                return res.end();
+            });
 
-    }else if(url === '/node'){
-
-        res.writeHead=(200,{'Content-Type':'text/html'});
-        res.end('Welcome to Node');
-
-    }else{
-
-        res.writeHead=(200,{'Content-Type':'text/html'});
-        res.end('404 NOT FOUND');
+        });
+        
+        
     }
 
-});
+    res.setHeader('Content-Type','text/html');
+    
 
-const PORT=4000;
-server.listen(PORT,()=>{
-    console.log(`Server is Running `);
-});
+})
+
+server.listen(4000);
+    
+

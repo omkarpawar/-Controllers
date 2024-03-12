@@ -1,10 +1,11 @@
+const path = require('path')
 const express = require('express');
-
+const rootDir=require('../util/path');
 const route = express.Router();
 
 route.get('/',(req, res, next)=>{
     console.log("main page");
-    res.send('<h1>this is main page</h1>')
+    res.sendFile(path.join(rootDir,'views','shop.html'));
 });
 
 module.exports=route;

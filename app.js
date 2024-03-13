@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const http =require('http');
 const bodyParser=require('body-parser');
+const errorController=require('./controllers/error')
 const app = express();
 
 const contactUs=require('./routes/contactUs');
@@ -15,9 +16,7 @@ app.use('/admin',adminRoutes);
 app.use('/shop',shopRoutes);
 
 
-app.use((req,res)=>{
-    res.sendFile(path.join(__dirname,'./','views','pageNotFound.html'));
-})
+app.use(errorController.pageNotFound);
 
 app.listen(3000);
     
